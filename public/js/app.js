@@ -567,6 +567,18 @@ module.exports = E;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
+var _technologies = require('./components/technologies.js');
+
+var _technologies2 = _interopRequireDefault(_technologies);
+
+var _technologyForm = require('./components/technologyForm.js');
+
+var _technologyForm2 = _interopRequireDefault(_technologyForm);
+
+var _user = require('./components/user.js');
+
+var _user2 = _interopRequireDefault(_user);
+
 var _signin = require('./components/signin.js');
 
 var _signin2 = _interopRequireDefault(_signin);
@@ -575,16 +587,24 @@ var _signup = require('./components/signup.js');
 
 var _signup2 = _interopRequireDefault(_signup);
 
+var _menu = require('./components/menu.js');
+
+var _menu2 = _interopRequireDefault(_menu);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var App = function () {
-    function App(body) {
+    function App(body, footer) {
         _classCallCheck(this, App);
 
         this.signin = new _signin2.default(body);
         this.signup = new _signup2.default(body);
+        this.technologies = new _technologies2.default(body);
+        this.technologyForm = new _technologyForm2.default(body);
+        this.user = new _user2.default(body);
+        this.menu = new _menu2.default(footer);
     }
 
     _createClass(App, [{
@@ -598,6 +618,10 @@ var App = function () {
         value: function addEventListener() {
             this.signinEvents();
             this.signupEvents();
+            this.technologiesEvents();
+            this.technologyFormEvents();
+            this.userEvents();
+            this.menuEvents();
         }
     }, {
         key: 'signinEvents',
@@ -609,7 +633,8 @@ var App = function () {
             });
             this.signin.on('signin', function (token) {
                 localStorage.setItem('token', 'JWT ' + token);
-                alert('Você esta autenticado!');
+                _this.menu.render('technologies');
+                _this.technologies.render();
             });
             this.signin.on('signup', function () {
                 return _this.signup.render();
@@ -623,9 +648,76 @@ var App = function () {
             this.signup.on('error', function () {
                 return alert('Erro no cadastro');
             });
-            this.signup.on('signup', function (user) {
-                alert(user.name + ' voc\xEA foi cadastrado com sucesso!');
+            this.signup.on('signup', function (returnedData) {
+                alert(returnedData.data.name + ' voc\xEA foi cadastrado com sucesso!');
                 _this2.signin.render();
+            });
+        }
+    }, {
+        key: 'technologiesEvents',
+        value: function technologiesEvents() {
+            var _this3 = this;
+
+            this.technologies.on('error', function () {
+                return alert('Erro ao listar tecnologias');
+            });
+            this.technologies.on('remove-error', function () {
+                return alert('Erro ao excluir');
+            });
+            this.technologies.on('update-error', function () {
+                return alert('Erro ao atualizar');
+            });
+            this.technologies.on('remove', function () {
+                return _this3.technologies.render();
+            });
+            this.technologies.on('update', function () {
+                return _this3.technologies.render();
+            });
+        }
+    }, {
+        key: 'technologyFormEvents',
+        value: function technologyFormEvents() {
+            var _this4 = this;
+
+            this.technologyForm.on('error', function () {
+                return alert('Erro ao cadastrar tecnologia');
+            });
+            this.technologyForm.on('submit', function () {
+                _this4.menu.render('technologies');
+                _this4.technologies.render();
+            });
+        }
+    }, {
+        key: 'userEvents',
+        value: function userEvents() {
+            var _this5 = this;
+
+            this.user.on('error', function () {
+                return alert('Erro carregar usuário');
+            });
+            this.user.on('remove-error', function () {
+                return alert('Erro ao excluir conta');
+            });
+            this.user.on('remove-account', function () {
+                alert('Que pena! Sua conta foi excluída.');
+                localStorage.clear();
+                _this5.menu.clear();
+                _this5.signin.render();
+            });
+        }
+    }, {
+        key: 'menuEvents',
+        value: function menuEvents() {
+            var _this6 = this;
+
+            this.menu.on('click', function (path) {
+                _this6.menu.render(path);
+                _this6[path].render();
+            });
+            this.menu.on('logout', function () {
+                localStorage.clear();
+                _this6.menu.clear();
+                _this6.signin.render();
             });
         }
     }]);
@@ -635,7 +727,91 @@ var App = function () {
 
 module.exports = App;
 
-},{"./components/signin.js":4,"./components/signup.js":5}],4:[function(require,module,exports){
+},{"./components/menu.js":4,"./components/signin.js":5,"./components/signup.js":6,"./components/technologies.js":7,"./components/technologyForm.js":8,"./components/user.js":9}],4:[function(require,module,exports){
+'use strict';
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _ntechnology = require('../ntechnology.js');
+
+var _ntechnology2 = _interopRequireDefault(_ntechnology);
+
+var _footer = require('../templates/footer.js');
+
+var _footer2 = _interopRequireDefault(_footer);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Menu = function (_NTechnology) {
+    _inherits(Menu, _NTechnology);
+
+    function Menu(body) {
+        _classCallCheck(this, Menu);
+
+        var _this = _possibleConstructorReturn(this, (Menu.__proto__ || Object.getPrototypeOf(Menu)).call(this));
+
+        _this.body = body;
+        return _this;
+    }
+
+    _createClass(Menu, [{
+        key: 'render',
+        value: function render(path) {
+            this.body.innerHTML = _footer2.default.render(path);
+            this.addEventListener();
+        }
+    }, {
+        key: 'clear',
+        value: function clear() {
+            this.body.innerHTML = '';
+        }
+    }, {
+        key: 'addEventListener',
+        value: function addEventListener() {
+            this.pathsClick();
+            this.logoutClick();
+        }
+    }, {
+        key: 'pathsClick',
+        value: function pathsClick() {
+            var _this2 = this;
+
+            var links = this.body.querySelectorAll('[data-path]');
+
+            for (var i = 0, max = links.length; i < max; i++) {
+                links[i].addEventListener('click', function (e) {
+                    e.preventDefault();
+                    var link = e.target.parentElement;
+                    var path = link.getAttribute('data-path');
+                    _this2.emit('click', path);
+                });
+            }
+        }
+    }, {
+        key: 'logoutClick',
+        value: function logoutClick() {
+            var _this3 = this;
+
+            var link = this.body.querySelector('[data-logout]');
+            link.addEventListener('click', function (e) {
+                e.preventDefault();
+                _this3.emit('logout');
+            });
+        }
+    }]);
+
+    return Menu;
+}(_ntechnology2.default);
+
+module.exports = Menu;
+
+},{"../ntechnology.js":10,"../templates/footer.js":11}],5:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -730,7 +906,7 @@ var Signin = function (_NTechnology) {
 
 module.exports = Signin;
 
-},{"../ntechnology.js":6,"../templates/signin.js":7}],5:[function(require,module,exports){
+},{"../ntechnology.js":10,"../templates/signin.js":12}],6:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -816,7 +992,334 @@ var Signup = function (_NTechnology) {
 
 module.exports = Signup;
 
-},{"../ntechnology.js":6,"../templates/signup.js":8}],6:[function(require,module,exports){
+},{"../ntechnology.js":10,"../templates/signup.js":13}],7:[function(require,module,exports){
+'use strict';
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _ntechnology = require('../ntechnology.js');
+
+var _ntechnology2 = _interopRequireDefault(_ntechnology);
+
+var _technologies = require('../templates/technologies.js');
+
+var _technologies2 = _interopRequireDefault(_technologies);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Technologies = function (_NTechnology) {
+    _inherits(Technologies, _NTechnology);
+
+    function Technologies(body) {
+        _classCallCheck(this, Technologies);
+
+        var _this = _possibleConstructorReturn(this, (Technologies.__proto__ || Object.getPrototypeOf(Technologies)).call(this));
+
+        _this.body = body;
+        return _this;
+    }
+
+    _createClass(Technologies, [{
+        key: 'render',
+        value: function render() {
+            this.renderTechnologyList();
+        }
+    }, {
+        key: 'addEventListener',
+        value: function addEventListener() {
+            this.technologyDoneCheckbox();
+            this.technologyRemoveClick();
+        }
+    }, {
+        key: 'renderTechnologyList',
+        value: function renderTechnologyList() {
+            var _this2 = this;
+
+            var opts = {
+                method: 'GET',
+                url: this.URL + '/technology',
+                json: true,
+                headers: {
+                    authorization: localStorage.getItem('token')
+                }
+            };
+
+            this.request(opts, function (err, resp, returnedData) {
+                if (err) {
+                    _this2.emit('error', err);
+                } else {
+                    _this2.body.innerHTML = _technologies2.default.render(returnedData.data);
+                    _this2.addEventListener();
+                }
+            });
+        }
+    }, {
+        key: 'technologyDoneCheckbox',
+        value: function technologyDoneCheckbox() {
+            var _this3 = this;
+
+            var dones = this.body.querySelectorAll('[data-done]');
+
+            for (var i = 0, max = dones.length; i < max; i++) {
+                dones[i].addEventListener('click', function (e) {
+
+                    e.preventDefault();
+                    var id = e.target.getAttribute('data-technology-id');
+                    var done = e.target.getAttribute('data-technology-done');
+                    var opts = {
+                        method: 'PUT',
+                        url: _this3.URL + '/technology/' + id,
+                        headers: {
+                            authorization: localStorage.getItem('token'),
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            done: !done
+                        })
+                    };
+                    _this3.request(opts, function (err, resp, returnedData) {
+                        if (err || resp.status === 412) {
+                            _this3.emit('update-error', err);
+                        } else {
+                            _this3.emit('update');
+                        }
+                    });
+                });
+            }
+        }
+    }, {
+        key: 'technologyRemoveClick',
+        value: function technologyRemoveClick() {
+            var _this4 = this;
+
+            var removes = this.body.querySelectorAll('[data-remove]');
+            for (var i = 0, max = removes.length; i < max; i++) {
+                removes[i].addEventListener('click', function (e) {
+
+                    e.preventDefault();
+                    if (confirm('Deseja excluir esta tecnologia?')) {
+                        var id = e.target.getAttribute('data-technology-id');
+                        var opts = {
+                            method: 'DELETE',
+                            url: _this4.URL + '/technology/' + id,
+                            headers: {
+                                authorization: localStorage.getItem('token')
+                            }
+                        };
+
+                        _this4.request(opts, function (err, resp, returnedData) {
+                            if (err || resp.status === 412) {
+                                _this4.emit('remove-error', err);
+                            } else {
+                                _this4.emit('remove');
+                            }
+                        });
+                    }
+                });
+            }
+        }
+    }]);
+
+    return Technologies;
+}(_ntechnology2.default);
+
+module.exports = Technologies;
+
+},{"../ntechnology.js":10,"../templates/technologies.js":14}],8:[function(require,module,exports){
+'use strict';
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _ntechnology = require('../ntechnology.js');
+
+var _ntechnology2 = _interopRequireDefault(_ntechnology);
+
+var _technologyForm = require('../templates/technologyForm.js');
+
+var _technologyForm2 = _interopRequireDefault(_technologyForm);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var TechnologyForm = function (_NTechnology) {
+    _inherits(TechnologyForm, _NTechnology);
+
+    function TechnologyForm(body) {
+        _classCallCheck(this, TechnologyForm);
+
+        var _this = _possibleConstructorReturn(this, (TechnologyForm.__proto__ || Object.getPrototypeOf(TechnologyForm)).call(this));
+
+        _this.body = body;
+        return _this;
+    }
+
+    _createClass(TechnologyForm, [{
+        key: 'render',
+        value: function render() {
+            this.body.innerHTML = _technologyForm2.default.render();
+            this.body.querySelector('[data-technology]').focus();
+            this.addEventListener();
+        }
+    }, {
+        key: 'addEventListener',
+        value: function addEventListener() {
+            this.formSubmit();
+        }
+    }, {
+        key: 'formSubmit',
+        value: function formSubmit() {
+            var _this2 = this;
+
+            var form = this.body.querySelector('form');
+
+            form.addEventListener('submit', function (e) {
+                e.preventDefault();
+
+                var technology = e.target.querySelector('[data-technology]');
+                var note = e.target.querySelector('[data-note]');
+                var opts = {
+                    method: 'POST',
+                    url: _this2.URL + '/technology',
+                    json: true,
+                    headers: {
+                        authorization: localStorage.getItem('token')
+                    },
+                    body: {
+                        name: technology.value,
+                        note: note.value
+                    }
+                };
+
+                _this2.request(opts, function (err, resp, data) {
+                    if (err || resp.status === 412) {
+                        _this2.emit('error');
+                    } else {
+                        _this2.emit('submit');
+                    }
+                });
+            });
+        }
+    }]);
+
+    return TechnologyForm;
+}(_ntechnology2.default);
+
+module.exports = TechnologyForm;
+
+},{"../ntechnology.js":10,"../templates/technologyForm.js":15}],9:[function(require,module,exports){
+"use strict";
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _ntechnology = require("../ntechnology.js");
+
+var _ntechnology2 = _interopRequireDefault(_ntechnology);
+
+var _user = require("../templates/user.js");
+
+var _user2 = _interopRequireDefault(_user);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var User = function (_NTechnology) {
+    _inherits(User, _NTechnology);
+
+    function User(body) {
+        _classCallCheck(this, User);
+
+        var _this = _possibleConstructorReturn(this, (User.__proto__ || Object.getPrototypeOf(User)).call(this));
+
+        _this.body = body;
+        return _this;
+    }
+
+    _createClass(User, [{
+        key: "render",
+        value: function render() {
+            this.renderUserData();
+        }
+    }, {
+        key: "addEventListener",
+        value: function addEventListener() {
+            this.userCancelClick();
+        }
+    }, {
+        key: "renderUserData",
+        value: function renderUserData() {
+            var _this2 = this;
+
+            var opts = {
+                method: "GET",
+                url: this.URL + "/user",
+                json: true,
+                headers: {
+                    authorization: localStorage.getItem("token")
+                }
+            };
+
+            this.request(opts, function (err, resp, returnedData) {
+                if (err || resp.status === 412) {
+                    _this2.emit("error", err);
+                } else {
+                    _this2.body.innerHTML = _user2.default.render(returnedData.data);
+                    _this2.addEventListener();
+                }
+            });
+        }
+    }, {
+        key: "userCancelClick",
+        value: function userCancelClick() {
+            var _this3 = this;
+
+            var button = this.body.querySelector("[data-remove-account]");
+
+            button.addEventListener("click", function (e) {
+                e.preventDefault();
+
+                if (confirm("Tem certeza que deseja excluir sua conta?")) {
+                    var opts = {
+                        method: "DELETE",
+                        url: _this3.URL + "/user",
+                        headers: {
+                            authorization: localStorage.getItem("token")
+                        }
+                    };
+
+                    _this3.request(opts, function (err, resp, data) {
+                        if (err || resp.status === 412) {
+                            _this3.emit("remove-error", err);
+                        } else {
+                            _this3.emit("remove-account");
+                        }
+                    });
+                }
+            });
+        }
+    }]);
+
+    return User;
+}(_ntechnology2.default);
+
+module.exports = User;
+
+},{"../ntechnology.js":10,"../templates/user.js":16}],10:[function(require,module,exports){
 'use strict';
 
 var _tinyEmitter = require('tiny-emitter');
@@ -853,7 +1356,19 @@ var NTechnology = function (_TinyEmitter) {
 
 module.exports = NTechnology;
 
-},{"browser-request":1,"tiny-emitter":2}],7:[function(require,module,exports){
+},{"browser-request":1,"tiny-emitter":2}],11:[function(require,module,exports){
+"use strict";
+
+exports.render = function (path) {
+
+    var isTechnologies = path === "technologies" ? "active" : "";
+    var isTechnologyForm = path === "technologyForm" ? "active" : "";
+    var isUser = path === "user" ? "active" : "";
+
+    return "\n        <div class=\"tabs-striped tabs-color-calm\">\n            <div class=\"tabs\">\n                <a data-path=\"technologies\" class=\"tab-item " + isTechnologies + "\">\n                    <i class=\"icon ion-home\"></i>\n                </a>\n                <a data-path=\"technologyForm\" class=\"tab-item " + isTechnologyForm + "\">\n                    <i class=\"icon ion-compose\"></i>\n                </a>\n                <a data-path=\"user\" class=\"tab-item " + isUser + "\">\n                    <i class=\"icon ion-person\"></i>\n                </a>\n                <a data-logout class=\"tab-item\">\n                    <i class=\"icon ion-android-exit\"></i>\n                </a>\n            </div>\n        </div>";
+};
+
+},{}],12:[function(require,module,exports){
 "use strict";
 
 exports.render = function () {
@@ -861,7 +1376,7 @@ exports.render = function () {
     return "<form>\n                <div class=\"list\">\n                    <label class=\"item item-input item-stacked-label\">\n                        <span class=\"input-label\">Email</span>\n                        <input type=\"text\" data-email>\n                    </label>\n                    <label class=\"item item-input item-stacked-label\">\n                        <span class=\"input-label\">Senha</span>\n                        <input type=\"password\" data-password>\n                    </label>\n                </div>\n                <div class=\"padding\">\n                    <button class=\"button button-positive button-block\">\n                        <i class=\"ion-home\"></i> Entrar\n                    </button>\n                </div>\n            </form>\n            <div class=\"padding\">\n                <button class=\"button button-block\" data-signup>\n                    <i class=\"ion-person-add\"></i> Cadastrar\n                </button>\n            </div>";
 };
 
-},{}],8:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 "use strict";
 
 exports.render = function () {
@@ -869,18 +1384,55 @@ exports.render = function () {
     return "<form>\n                <div class=\"list\">\n                    <label class=\"item item-input item-stacked-label\">\n                        <span class=\"input-label\">Nome</span>\n                        <input type=\"text\" data-name>\n                    </label>\n                    <label class=\"item item-input item-stacked-label\">\n                        <span class=\"input-label\">Email</span>\n                        <input type=\"text\" data-email>\n                    </label>\n                    <label class=\"item item-input item-stacked-label\">\n                        <span class=\"input-label\">Senha</span>\n                        <input type=\"password\" data-password>\n                    </label>\n                </div>\n                <div class=\"padding\">\n                    <button class=\"button button-positive button-block\">\n                        <i class=\"ion-thumbsup\"></i> Cadastrar\n                    </button>\n                </div>\n            </form>";
 };
 
-},{}],9:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 'use strict';
 
-var _app = require('./app.js');
+var renderTechnologies = function renderTechnologies(technologies) {
+
+    return technologies.map(function (technology) {
+
+        var done = technology.done ? 'ios-checkmark' : 'ios-circle-outline';
+
+        return '<li class="item item-icon-left item-button-right">\n                        <i class="icon ion-' + done + '" data-done\n                            data-technology-done="' + (technology.done ? 'done' : '') + '"\n                            data-technology-id="' + technology.id + '"></i>\n                        ' + technology.name + ' ' + (technology.note ? ' - ' + technology.note : '') + '\n                        <button data-remove data-technology-id="' + technology.id + '" class="button button-assertive">\n                            <i class="ion-trash-a"></i>\n                        </button>\n                    </li>';
+    }).join('');
+};
+
+exports.render = function (technologies) {
+    if (technologies && technologies.length) {
+        return '<ul class="list">' + renderTechnologies(technologies) + '</ul>';
+    }
+    return '<h4 class="text-center">Nenhuma tecnologia ainda</h4>';
+};
+
+},{}],15:[function(require,module,exports){
+"use strict";
+
+exports.render = function () {
+
+    return "<form>\n                <div class=\"list\">\n                    <label class=\"item item-input item-stacked-label\">\n                        <span class=\"input-label\">Tecnologia</span>\n                        <input type=\"text\" data-technology>\n                    </label>\n                    <label class=\"item item-input item-stacked-label\">\n                        <span class=\"input-label\">Nota</span>\n                        <input type=\"text\" data-note>\n                    </label>\n                </div>\n                <div class=\"padding\">\n                    <button class=\"button button-positive button-block\">\n                        <i class=\"ion-compose\"></i> Salvar\n                    </button>\n                </div>\n            </form>";
+};
+
+},{}],16:[function(require,module,exports){
+"use strict";
+
+exports.render = function (user) {
+
+    return "<div class=\"list\">\n                <label class=\"item item-input item-stacked-label\">\n                    <span class=\"input-label\">Nome</span>\n                    <small class=\"dark\">" + user.name + "</small>\n                </label>\n                <label class=\"item item-input item-stacked-label\">\n                    <span class=\"input-label\">Email</span>\n                    <small class=\"dark\">" + user.email + "</small>\n                </label>\n            </div>\n            <div class=\"padding\">\n                <button data-remove-account class=\"button button-assertive button-block\">\n                    <i class=\"ion-trash-a\"></i> Excluir conta\n                </button>\n            </div>";
+};
+
+},{}],17:[function(require,module,exports){
+"use strict";
+
+var _app = require("./app.js");
 
 var _app2 = _interopRequireDefault(_app);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 window.onload = function () {
-    var main = document.querySelector('main');
-    new _app2.default(main).init();
+    var main = document.querySelector("main");
+    var footer = document.querySelector("footer");
+    new _app2.default(main, footer).init();
 };
 
-},{"./app.js":3}]},{},[9]);
+},{"./app.js":3}]},{},[17]);
