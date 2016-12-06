@@ -13,7 +13,6 @@ class Technologies extends NTechnology {
     }
 
     addEventListener() {
-        this.technologyDoneCheckbox();
         this.technologyRemoveClick();
     }
 
@@ -36,37 +35,6 @@ class Technologies extends NTechnology {
                 this.addEventListener();
             }
         });
-    }
-
-    technologyDoneCheckbox() {
-        const dones = this.body.querySelectorAll('[data-done]');
-
-        for(let i = 0, max = dones.length; i < max; i++) {
-            dones[i].addEventListener('click', (e) => {
-
-                e.preventDefault();
-                const id = e.target.getAttribute('data-technology-id');
-                const done = e.target.getAttribute('data-technology-done');
-                const opts = {
-                    method: 'PUT',
-                    url: `${this.URL}/technology/${id}`,
-                    headers: {
-                        authorization: localStorage.getItem('token'),
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        done: !done
-                    })
-                };
-                this.request(opts, (err, resp, returnedData) => {
-                    if (err || resp.status === 412) {
-                        this.emit('update-error', err);
-                    } else {
-                        this.emit('update');
-                    }
-                });
-            });
-        }
     }
 
     technologyRemoveClick() {

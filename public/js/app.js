@@ -1033,7 +1033,6 @@ var Technologies = function (_NTechnology) {
     }, {
         key: 'addEventListener',
         value: function addEventListener() {
-            this.technologyDoneCheckbox();
             this.technologyRemoveClick();
         }
     }, {
@@ -1060,43 +1059,9 @@ var Technologies = function (_NTechnology) {
             });
         }
     }, {
-        key: 'technologyDoneCheckbox',
-        value: function technologyDoneCheckbox() {
-            var _this3 = this;
-
-            var dones = this.body.querySelectorAll('[data-done]');
-
-            for (var i = 0, max = dones.length; i < max; i++) {
-                dones[i].addEventListener('click', function (e) {
-
-                    e.preventDefault();
-                    var id = e.target.getAttribute('data-technology-id');
-                    var done = e.target.getAttribute('data-technology-done');
-                    var opts = {
-                        method: 'PUT',
-                        url: _this3.URL + '/technology/' + id,
-                        headers: {
-                            authorization: localStorage.getItem('token'),
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            done: !done
-                        })
-                    };
-                    _this3.request(opts, function (err, resp, returnedData) {
-                        if (err || resp.status === 412) {
-                            _this3.emit('update-error', err);
-                        } else {
-                            _this3.emit('update');
-                        }
-                    });
-                });
-            }
-        }
-    }, {
         key: 'technologyRemoveClick',
         value: function technologyRemoveClick() {
-            var _this4 = this;
+            var _this3 = this;
 
             var removes = this.body.querySelectorAll('[data-remove]');
             for (var i = 0, max = removes.length; i < max; i++) {
@@ -1107,17 +1072,17 @@ var Technologies = function (_NTechnology) {
                         var id = e.target.getAttribute('data-technology-id');
                         var opts = {
                             method: 'DELETE',
-                            url: _this4.URL + '/technology/' + id,
+                            url: _this3.URL + '/technology/' + id,
                             headers: {
                                 authorization: localStorage.getItem('token')
                             }
                         };
 
-                        _this4.request(opts, function (err, resp, returnedData) {
+                        _this3.request(opts, function (err, resp, returnedData) {
                             if (err || resp.status === 412) {
-                                _this4.emit('remove-error', err);
+                                _this3.emit('remove-error', err);
                             } else {
-                                _this4.emit('remove');
+                                _this3.emit('remove');
                             }
                         });
                     }
@@ -1393,7 +1358,7 @@ var renderTechnologies = function renderTechnologies(technologies) {
 
         var done = technology.done ? 'ios-checkmark' : 'ios-circle-outline';
 
-        return '<li class="item item-icon-left item-button-right">\n                        <i class="icon ion-' + done + '" data-done\n                            data-technology-done="' + (technology.done ? 'done' : '') + '"\n                            data-technology-id="' + technology.id + '"></i>\n                        ' + technology.name + ' ' + (technology.note ? ' - ' + technology.note : '') + '\n                        <button data-remove data-technology-id="' + technology.id + '" class="button button-assertive">\n                            <i class="ion-trash-a"></i>\n                        </button>\n                    </li>';
+        return '<li class="item item-button-right">\n                        ' + technology.name + ' ' + (technology.note ? ' - ' + technology.note : '') + '\n                        <button data-remove data-technology-id="' + technology.id + '" class="button button-assertive">\n                            <i class="ion-trash-a"></i>\n                        </button>\n                    </li>';
     }).join('');
 };
 
